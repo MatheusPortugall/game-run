@@ -16,7 +16,7 @@
   </style>
   <body>
         <script>
-            var canvas, ctx, ALTURA, LARGURA, frames=0, maxPulos=3, velocidade=6, estadoAtual;
+            var canvas, ctx, ALTURA, LARGURA, frames=0, maxPulos=3, velocidade=6, estadoAtual, record=0;
 
             estados = {
                 jogar: 0,
@@ -68,6 +68,10 @@
                 reset: function() {
                     this.velocidade = 0;
                     this.y = 0;
+                    if(this.score > record) {
+                        localStorage.setItem("record", this.score);
+                        record = this.score;
+                    }
                     this.score = 0;
                 },
 
@@ -127,7 +131,7 @@
                     bloco.pula();
                 } else if (estadoAtual == estados.jogar) {
                     estadoAtual = estados.jogando;
-                    bloco.score = 0;
+                    bloco.reset();
                 } else if (estadoAtual == estados.perdeu && bloco.y >= 2*ALTURA) {
                     estadoAtual = estados.jogar;
                     obstaculos.limpa();
@@ -154,6 +158,7 @@
                 document.addEventListener("mousedown", clique);
 
                 estadoAtual = estados.jogar;
+                reset = localStorage.getItem("record");
                 roda();
             }
             function roda(){
@@ -179,6 +184,17 @@
                     ctx.save();
                     ctx.translate(LARGURA / 2, ALTURA / 2);
                     ctx.fillStyle = "#fff";
+
+                    if(bloco.score > record) {
+                        ctx.fillText("Novo Record!", -150, -65);
+                    } else if (record < 10) {
+                        ctx.fillText("Record " + record, -99, -65);
+                    } else if (record >= 10 && record < 100) {
+                        ctx.fillText("Record " + record, -112, -65);
+                    } else {
+                        ctx.fillText("Record " + record, -125, -65);
+                    }
+
                     if(bloco.score < 10) ctx.fillText(bloco.score, -13, 19);
                     else if(bloco.score >= 10 && bloco.score < 100) ctx.fillText(bloco.score, -26, 19);
                     else ctx.fillText(bloco.score, -39, 19);
